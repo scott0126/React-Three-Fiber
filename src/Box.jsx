@@ -1,22 +1,27 @@
-import {useRef, useLayoutEffect} from 'react'
+import {useRef, useState, useEffect, useMemo} from 'react'
 import { useFrame } from '@react-three/fiber'
+import * as THREE from 'three'
 
 export default function Box(props) {
     const ref = useRef()
+    const [rotate, setRotate] = useState(false)
+    const [count, setCount] = useState(0)
+    const geometry = useMemo(() => [new THREE.BoxGeometry(), new THREE.SphereGeometry(0.785398)], [])
+
+    useEffect(() => {
+        console.log(ref.current.geometry.uuid)
+    })
 
     useFrame((_, delta) => {
-        ref.current.rotation.x += 1 * delta;
+        ref.current.rotation.x += delta;
         ref.current.rotation.y += 0.5 * delta;
     })
     return (
         <mesh 
             {...props} 
             ref={ref}
-            onPointerDown={(e)=> console.log('pointer down ' + e.object.name)}
-            onPoitnerUp={(e)=> console.log('pointer up ' + e.object.name)}
-            onPointerOver={(e)=> console.log('pointer over ' + e.object.name)}
-            onPointerOut={(e)=> console.log('pointer out ' + e.object.name)}
-            onUpdate={(e)=> console.log(self)}
+            onPointerDown={() => setCount((count + 1) % 2)}
+            geometry={geometry[count]}
         >
             <boxGeometry />
             <meshBasicMaterial color={0x00ff00} wireframe />
